@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisa de Participantes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0e0f8;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            margin: 20px auto;
+            width: 80%;
+        }
+        h1 {
+            text-align: center;
+            color: #6a0dad;
+        }
+        .form-container, .table-container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        h2 {
+            color: #6a0dad;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #6a0dad;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #6a0dad;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #5a0cbd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #6a0dad;
+            color: #fff;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Pesquisa de Participantes</h1>
+    <div class="form-container">
+        <h2>Adicionar Participante</h2>
+        <form id="participantForm">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required><br><br>
+            <label for="idade">Idade:</label>
+            <input type="number" id="idade" name="idade" required><br><br>
+            <label for="sexo">Sexo:</label>
+            <select id="sexo" name="sexo">
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+            </select><br><br>
+            <label for="estado">Estado:</label>
+            <input type="text" id="estado" name="estado" required><br><br>
+            <label for="escolaridade">Escolaridade:</label>
+            <input type="text" id="escolaridade" name="escolaridade" required><br><br>
+            <label for="estado_civil">Estado Civil:</label>
+            <input type="text" id="estado_civil" name="estado_civil" required><br><br>
+            <label for="tem_filhos">Tem filhos:</label>
+            <select id="tem_filhos" name="tem_filhos">
+                <option value="1">Sim</option>
+                <option value="0">Não</option>
+            </select><br><br>
+            <button type="submit">Adicionar</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <h2>Participantes</h2>
+        <table id="participantsTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>Sexo</th>
+                    <th>Estado</th>
+                    <th>Escolaridade</th>
+                    <th>Estado Civil</th>
+                    <th>Tem Filhos</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.getElementById('participantForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var formData = new FormData(event.target);
+    var jsonData = {};
+    formData.forEach((value, key) => {jsonData[key] = value});
+    
+    fetch('/add_participant', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(jsonData)
+    }).then(response => response.json()).then(data => {
+        console.log(data);
+        loadParticipants();
+    });
+});
+
+function loadParticipants() {
+    fetch('/get_participants')
+    .then(response => response.json())
+    .then(data => {
+        var tableBody = document.querySelector('#participantsTable tbody');
+        tableBody.innerHTML = '';
+        data.forEach(participant => {
+            var row = document.createElement('tr');
+            Object.values(participant).forEach(text => {
+                var cell = document.createElement('td');
+                cell.textContent = text;
+                row.appendChild(cell);
+            });
+            tableBody.appendChild(row);
+        });
+    });
+}
+
+window.onload = loadParticipants;
+</script>
+
+</body>
+</html>
